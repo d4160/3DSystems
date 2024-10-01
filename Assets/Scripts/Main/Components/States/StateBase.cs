@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using UnityEngine;
 
 [System.Serializable]
@@ -20,9 +19,6 @@ public abstract class StateBase : IState
         }
     }
 
-    /// <summary>
-    /// Only called once
-    /// </summary>
     public virtual void Start()
     {
 
@@ -34,6 +30,11 @@ public abstract class StateBase : IState
     }
 
     public virtual void Update()
+    {
+
+    }
+
+    public virtual void FixedUpdate()
     {
 
     }
@@ -52,5 +53,6 @@ public interface IState
     void Start();
     void OnEnter();
     void Update();
+    void FixedUpdate();
     void OnExit();
 }

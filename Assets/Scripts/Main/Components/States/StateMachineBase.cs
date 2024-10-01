@@ -1,31 +1,47 @@
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
+using UnityEngine;
 
 public class StateMachineBase<T> : ComponentBase, IStateMachine<T> where T : IState
 {
-    protected Dictionary<int, T> _activeStatesByLayer = new();
+    protected List<LayerState<T>> _activeStatesByLayer = new();
 
-    public Dictionary<int, T> ActiveStatesByLayer => _activeStatesByLayer;
+    public List<LayerState<T>> ActiveStatesByLayer => _activeStatesByLayer;
 
-    public virtual void SetState(T newState)
+    [ShowInInspector, TextArea]
+    public string ActiveStates
     {
-        if (_activeStatesByLayer.ContainsKey(newState.Layer))
+        get
         {
-            _activeStatesByLayer[newState.Layer].OnExit();
-            _activeStatesByLayer[newState.Layer] = newState;
+            string debug = string.Empty;
+            for (var i = 0; i < _activeStatesByLayer.Count; i++)
+            {
+                debug += $"Layer: {_activeStatesByLayer[i].layer}, State: {_activeStatesByLayer[i].state}\n";
+            }
+            return debug;
+        }
+    }
+
+    public void SetState(T newState)
+    {
+        if (_activeStatesByLayer.Contains(newState.Layer, out int index))
+        {
+            _activeStatesByLayer[index].state.OnExit();
+            _activeStatesByLayer[index] = new(newState.Layer, newState);
             newState.OnEnter();
         }
         else
         {
-            _activeStatesByLayer.Add(newState.Layer, newState);
+            _activeStatesByLayer.Add(new(newState.Layer, newState));
             newState.OnEnter();
         }
     }
 
     public T GetActiveState(int layer)
     {
-        if (_activeStatesByLayer.ContainsKey(layer))
+        if (_activeStatesByLayer.Contains(layer, out int index))
         {
-            return _activeStatesByLayer[layer];
+            return _activeStatesByLayer[index].state;
         }
 
         return default;
@@ -33,20 +49,61 @@ public class StateMachineBase<T> : ComponentBase, IStateMachine<T> where T : ISt
 
     protected virtual void Update()
     {
-        foreach (var state in _activeStatesByLayer)
+        for (var i = 0; i < _activeStatesByLayer.Count; i++)
         {
-            state.Value.Update();
+            _activeStatesByLayer[i].state.Update();
+        }
+    }
+
+    protected virtual void FixedUpdate()
+    {
+        for (var i = 0; i < _activeStatesByLayer.Count; i++)
+        {
+            _activeStatesByLayer[i].state.FixedUpdate();
         }
     }
 }
 
 public interface IStateMachine<T> : IStateMachine where T : IState
 {
-    Dictionary<int, T> ActiveStatesByLayer { get; }
+    List<LayerState<T>> ActiveStatesByLayer { get; }
 
+    void SetState(T newState);
     T GetActiveState(int layer);
 }
 
 public interface IStateMachine
 {
+}
+
+public struct LayerState<T> : System.IEquatable<LayerState<T>> where T : IState
+{
+    public int layer;
+    public T state;
+
+    public LayerState(int layer, T state)
+    {
+        this.layer = layer;
+        this.state = state;
+    }
+
+    public bool Equals(LayerState<T> other) => other.layer == layer;
+}
+
+public static class LayerStateExtensions
+{
+    public static bool Contains<T>(this List<LayerState<T>> instance, int layer, out int index) where T : IState
+    {
+        for (int i = 0; i < instance.Count; i++)
+        {
+            if (instance[i].layer == layer)
+            {
+                index = i;
+                return true;
+            }
+        }
+
+        index = -1;
+        return false;
+    }
 }
