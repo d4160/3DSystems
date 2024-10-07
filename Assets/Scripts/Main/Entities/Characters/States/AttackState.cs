@@ -12,6 +12,8 @@ public class AttackState : CharacterStateBase
     [Header("States")]
     public string emptyState = "Empty";
 
+    [Header("Debug")]
+    [SerializeField] private bool _showLogs;
     private int _attackParamHash;
     private int _attackIndexParamHash;
     [SerializeField] private int _attackCounter;
@@ -44,7 +46,10 @@ public class AttackState : CharacterStateBase
     {
         AnimatorStateInfo stateInfo = Animator.GetCurrentAnimatorStateInfo(Layer);
 
-        //Debug.Log($"InTransition: {Animator.IsInTransition(Layer)},IsName: {stateInfo.IsName(emptyState)}");
+        if (_showLogs)
+        {
+            Debug.Log($"InTransition: {Animator.IsInTransition(Layer)},IsName: {stateInfo.IsName(emptyState)}");
+        }
 
         bool inTransition = Animator.IsInTransition(Layer);
         bool isEmptyState = stateInfo.IsName(emptyState);

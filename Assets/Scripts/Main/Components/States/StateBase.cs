@@ -43,6 +43,11 @@ public abstract class StateBase : IState
     {
 
     }
+
+    public virtual void OnDrawGizmos()
+    {
+
+    }
 }
 
 public interface IState
@@ -51,6 +56,7 @@ public interface IState
     IStateMachine StateMachine { get; set; }
 
     void Start();
+    void OnDrawGizmos();
     void OnEnter();
     void Update();
     void FixedUpdate();

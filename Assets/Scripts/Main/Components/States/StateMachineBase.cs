@@ -55,11 +55,19 @@ public class StateMachineBase<T> : ComponentBase, IStateMachine<T> where T : ISt
         }
     }
 
-    protected virtual void FixedUpdate()
+    protected void FixedUpdate()
     {
         for (var i = 0; i < _activeStatesByLayer.Count; i++)
         {
             _activeStatesByLayer[i].state.FixedUpdate();
+        }
+    }
+
+    protected virtual void OnDrawGizmos()
+    {
+        for (var i = 0; i < _activeStatesByLayer.Count; i++)
+        {
+            _activeStatesByLayer[i].state.OnDrawGizmos();
         }
     }
 }

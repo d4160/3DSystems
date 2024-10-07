@@ -47,6 +47,8 @@ public class JumpState : CharacterStateBase
                     Rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
                     break;
             }
+
+            CharacterMachine.IsGrounded = false;
         }
 
         _jumped = true;

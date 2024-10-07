@@ -33,7 +33,7 @@ public class CharacterMachine : StateMachineBase<ICharacterState>, ICharacterMac
 
     public Vector2 Motion => _motion;
     public bool Running => _running;
-    public bool IsGrounded => _isGrounded;
+    public bool IsGrounded { get => _isGrounded; set => _isGrounded = value; }
     public float Gravity => gravity;
     public Vector3 Velocity { get => _velocity; set => _velocity = value; }
 
@@ -69,7 +69,7 @@ public class CharacterMachine : StateMachineBase<ICharacterState>, ICharacterMac
 
     protected override void Update()
     {
-        _isGrounded = _characterController.isGrounded;
+        //_isGrounded = _characterController.isGrounded;
         Animator.SetBool(_isGroundedParamHash, _isGrounded);
 
         base.Update();
@@ -109,7 +109,7 @@ public interface ICharacterMachine : IStateMachine<ICharacterState>
 
     Vector2 Motion { get; }
     bool Running { get; }
-    bool IsGrounded { get; }
+    bool IsGrounded { get; set; }
     Vector3 Velocity { get; set; }
     float Gravity { get; }
 
